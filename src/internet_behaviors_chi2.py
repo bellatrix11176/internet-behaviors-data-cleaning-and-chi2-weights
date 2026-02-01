@@ -20,7 +20,6 @@ Notes:
 from __future__ import annotations
 
 import argparse
-import os
 from pathlib import Path
 
 import numpy as np
@@ -28,6 +27,16 @@ import pandas as pd
 from pandas.api.types import CategoricalDtype
 from scipy.stats import chi2_contingency
 import matplotlib.pyplot as plt
+
+
+# =========================
+# PATHS (GITHUB-SAFE)
+# =========================
+# Repo root = one level up from /src
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+DEFAULT_DATA_PATH = REPO_ROOT / "data" / "Internet-Behaviors.csv"
+OUTPUT_DIR = REPO_ROOT / "outputs"
 
 
 # =========================
@@ -62,9 +71,6 @@ SENSITIVE_COLS = [
 
 NUMERIC_BINS = 4
 PVALUE_WEAK_THRESHOLD = 0.20
-
-DEFAULT_DATA_PATH = Path("data") / "Internet-Behaviors.csv"
-OUTPUT_DIR = Path("outputs")
 
 
 # =========================
@@ -198,32 +204,47 @@ def resolve_data_path(user_path: str | None) -> Path:
     """
     Resolve dataset path:
     - If user passes --data, use it
-    - Else use default data/Internet-Behaviors.csv
-    - Give a helpful error message if not found
+    - Else use repo-root data/Internet-Behaviors.csv
+    - Provide helpful fallback if a single CSV exists in repo-root /data
     """
-    path = Path(user_path) if user_path else DEFAULT_DATA_PATH
+    if user_path:
+        path = Path(user_path).expanduser()
+        if path.exists():
+            return path
+
+        raise FileNotFoundError(
+            f"Cannot find dataset at:\n  {path.resolve()}\n\n"
+            "Fix options:\n"
+            "1) Provide the correct path via --data\n"
+            "2) Or place the CSV in the repo's /data folder\n"
+        )
+
+    # Default location (repo root /data)
+    path = DEFAULT_DATA_PATH
     if path.exists():
         return path
 
-    # Helpful fallback: search for any CSV in ./data
-    data_dir = Path("data")
+    # Fallback: if exactly one CSV exists in /data, use it
+    data_dir = REPO_ROOT / "data"
     if data_dir.exists():
         csvs = list(data_dir.glob("*.csv"))
         if len(csvs) == 1:
             return csvs[0]
 
     raise FileNotFoundError(
-        f"Cannot find dataset at:\n  {path.resolve()}\n\n"
+        "Cannot find dataset.\n\n"
+        f"Expected default path:\n  {path}\n\n"
         "Fix options:\n"
         "1) Put your CSV into the repo's /data folder (recommended)\n"
-        "2) Or run with: python src/python_internet_behaviors.py --data path/to/yourfile.csv\n"
+        "2) Or run with:\n"
+        "   python src/internet_behaviors_chi2.py --data path/to/yourfile.csv\n"
     )
 
 
 # =========================
 # MAIN
 # =========================
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Chi-square feature association weights for Internet Behaviors.")
     parser.add_argument("--data", type=str, default=None, help="Path to dataset CSV (defaults to data/Internet-Behaviors.csv)")
     args = parser.parse_args()
@@ -231,7 +252,9 @@ def main():
     ensure_dirs()
 
     data_path = resolve_data_path(args.data)
+    print(f"✅ Repo root:\n{REPO_ROOT}\n")
     print(f"✅ Using dataset:\n{data_path.resolve()}\n")
+    print(f"✅ Writing outputs to:\n{OUTPUT_DIR.resolve()}\n")
 
     df = pd.read_csv(data_path)
     df = minimal_cleaning(df)
