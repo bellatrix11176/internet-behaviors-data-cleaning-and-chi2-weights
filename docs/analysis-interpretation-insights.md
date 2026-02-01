@@ -1,92 +1,108 @@
-# Analysis, Interpretation, and Insights
+# Analysis Insights  
+## Internet Behaviors & Online Shopping Association
 
-This document provides the analytical reasoning and interpretation behind the **Chi-Square attribute weighting analysis** performed on the Internet Behaviors dataset. The goal of this project is to demonstrate foundational data science skills, including responsible data cleaning, appropriate statistical testing, and clear interpretation of results.
-
----
-
-## 1. Purpose of the Analysis
-
-The objective of this analysis is to identify which internet behavior attributes show a **statistically meaningful association** with **Online_Shopping**.
-
-This project is **exploratory**, not predictive. The focus is on understanding relationships in the data rather than building a machine learning model or optimizing accuracy.
+This document summarizes the **key insights** derived from the Chi-Square analysis after proper data cleaning and correction of invalid values. It focuses on *what the results mean*, not how the analysis was executed.
 
 ---
 
-## 2. Data Preparation Approach
+## Context
 
-The dataset was prepared using a **minimal and intentional cleaning strategy**:
+The analysis examines the relationship between selected internet behaviors and the likelihood of **Online Shopping** activity.
 
-- Text fields were trimmed and standardized
-- Yes/No style responses were normalized
-- Numeric variables were discretized into bins for Chi-Square compatibility
-- Rows were preserved whenever possible to avoid unnecessary data loss
-- Sensitive demographic attributes were removed only in the exported, shareable dataset
+Chi-Square tests were used to evaluate whether observed differences in shopping behavior across categories were statistically meaningful or likely due to chance.
 
-This approach avoids over-cleaning and preserves the original structure of the data, which is critical for maintaining data integrity during exploratory analysis.
+A critical correction was applied prior to final analysis:  
+invalid sentinel values (notably `99` in the Twitter variable) were identified and excluded to prevent distortion of results.
 
 ---
 
-## 3. Why Chi-Square?
+## High-Level Findings
 
-The Chi-Square test of independence is appropriate when:
+After correcting invalid values and re-running the analysis:
 
-- The target variable is categorical
-- Predictor variables are categorical or discretized
-- The goal is to measure **association**, not prediction
+- No single internet behavior overwhelmingly explains online shopping behavior
+- Some behaviors show **mild association**, but overall effects are modest
+- Many features exhibit **weak or statistically insignificant relationships**
 
-In this analysis:
-- **Higher Chi-Square values** indicate stronger association with Online_Shopping
-- **Lower p-values** provide stronger statistical evidence that the association is not due to random chance
-- **Higher p-values** indicate weak or unreliable evidence of association
+This suggests that online shopping behavior is influenced by **multiple interacting factors**, rather than any single internet habit.
 
 ---
 
-## 4. Key Results
+## Stronger (Relative) Associations
 
-The analysis revealed that certain behavioral attributes, such as **Years_on_Internet** and platform-related usage indicators, showed stronger associations with online shopping behavior based on their Chi-Square statistics.
+The following attributes demonstrated **higher Chi-Square values relative to others**, indicating a stronger association with Online Shopping *within this dataset*:
 
-Other attributes produced low or near-zero Chi-Square values, indicating that their distribution is nearly identical for shoppers and non-shoppers within this dataset.
+- **Years on Internet**  
+  Individuals with longer internet experience showed some variation in shopping behavior, suggesting familiarity and comfort with online environments may play a role.
 
----
+- **Hours Per Day Online**  
+  Time spent online showed a mild association, implying that exposure and opportunity may influence shopping likelihood.
 
-## 5. Interpreting Weak Signals
-
-Attributes with **high p-values (near 1.0)** should be interpreted cautiously.
-
-A high p-value does **not** mean:
-- the feature is meaningless in general
-- the feature has no real-world relevance
-
-It simply indicates that, within this dataset, there is insufficient statistical evidence to conclude a meaningful association with Online_Shopping.
+These relationships are **associative, not causal**, and should be interpreted cautiously.
 
 ---
 
-## 6. Practical Implications
+## Weaker or Non-Significant Associations
 
-In real-world analytics workflows, Chi-Square results like these are commonly used to:
+Several behaviors showed little to no meaningful relationship with Online Shopping:
 
-- Identify candidate features for modeling
-- Reduce noise in feature selection
-- Guide further exploratory or confirmatory analysis
-- Support hypothesis generation
+- **Twitter Usage**
+- **Facebook Usage**
+- **Online Gaming**
+- **Other Social Networks**
+- **Reading News Online**
 
-Chi-Square weighting is best viewed as a **decision-support tool**, not a final answer.
+After correcting invalid values, these features produced:
+- Low Chi-Square statistics
+- High p-values
+- Minimal explanatory value
 
----
-
-## 7. Limitations
-
-This analysis has several limitations:
-
-- Chi-Square measures association, not causation
-- Results depend on discretization strategy for numeric variables
-- Dataset size and class balance affect statistical power
-- Findings are specific to this dataset and context
+This indicates that **presence on specific platforms alone does not meaningfully distinguish shoppers from non-shoppers** in this dataset.
 
 ---
 
-## 8. Conclusion
+## Impact of Correcting Invalid Values
 
-This project demonstrates how foundational data science techniques—careful cleaning, appropriate statistical testing, and disciplined interpretation—can be used to extract meaningful insights from categorical behavioral data.
+Before correction, the presence of `99` in behavioral fields falsely inflated the importance of certain attributes.
 
-The emphasis throughout is on **understanding the data**, respecting its limitations, and communicating results clearly and responsibly.
+After treating these values as *unknown* and excluding them from statistical testing:
+
+- Association strengths decreased
+- Rankings shifted
+- Results became more consistent with realistic user behavior
+
+This confirms that **data integrity directly affects analytical conclusions**.
+
+---
+
+## Practical Implications
+
+From an applied analytics perspective:
+
+- Internet usage intensity may be a more useful signal than platform choice
+- Behavioral data alone may be insufficient for strong segmentation
+- Additional variables (e.g., income, purchase history, demographics) would likely be needed for more predictive insight
+
+This reinforces the importance of **feature selection and data enrichment** in behavioral analysis.
+
+---
+
+## Key Takeaway
+
+The most important insight from this analysis is methodological rather than numerical:
+
+> Clean data produces honest results — even when those results are less exciting.
+
+By correcting invalid values and avoiding over-interpretation, this analysis prioritizes **accuracy, transparency, and analytical discipline** over inflated findings.
+
+---
+
+## Next Steps (Optional Extensions)
+
+Future analyses could explore:
+- Effect size measures (e.g., Cramér’s V)
+- Multivariate models incorporating multiple behaviors
+- Comparison of Chi-Square with mutual information
+- Behavioral clustering prior to association testing
+
+These steps would deepen understanding while preserving data integrity.
